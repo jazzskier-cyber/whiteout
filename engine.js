@@ -5,7 +5,7 @@ export const AREAS=[
  {id:'peak',name:'落日峰顶',en:'LAST LIGHT PEAK',sky:0xf5d4bb,snow:0xfff0e5,accent:'#c16c48',trees:.8}];
 // Section kinds: pitch (drop per metre) drives gravity speed, bound is the half-width of the skiable lane.
 export const KINDS={
- start:{pitch:.15},runout:{pitch:.1},
+ start:{pitch:.3},runout:{pitch:.1},
  cruise:{pitch:.17,label:'巡航雪道',tip:'跟着雪晶的 S 弯 · 穿旗门攒连击'},
  slalom:{pitch:.22,label:'回转旗门',tip:'旗门左右交错 · 提前转弯'},
  gs:{pitch:.34,label:'大回转',tip:'高速大弯 · 提前切换方向'},
@@ -28,11 +28,11 @@ export const terminalSpeed=(pitch,tuck=false)=>Math.sqrt(Math.max(0,(9.8*pitch-F
 export const RAMPS={kicker:{len:7,h:1.3,width:4.6},big:{len:13,h:3.4,width:7},mega:{len:24,h:8.5,width:10}};
 const L=(name,en,area,sections)=>({name,en,area,sections});
 const SPECS=[
- L('初雪练习','FIRST TRACKS',0,[['cruise',380],['kickers',240],['cruise',200]]),
- L('旗门花园','GATE GARDEN',0,[['slalom',320],['flats',200],['slalom',300]]),
- L('波浪雪道','ROLLER COASTER',0,[['cruise',150],['rollers',450],['bigair',260]]),
- L('松林小径','PINE PATH',0,[['cruise',160],['glade',420],['kickers',240]]),
- L('第一道长坡','THE LONG HILL',0,[['cruise',150],['mega',500],['flats',260]]),
+ L('第一跳','FIRST FLIGHT',0,[['mega',320],['bigair',260],['kickers',300]]),
+ L('旗门飞台','GATES TO THE SKY',0,[['slalom',280],['megajump',420],['rollers',280]]),
+ L('波浪速降','ROLLER RUSH',0,[['rollers',380],['mega',360],['bigair',260]]),
+ L('松林断崖','PINE DROP',0,[['glade',360],['cliff',200],['kickers',300]]),
+ L('第一道长坡','THE LONG HILL',0,[['mega',600],['megajump',420]]),
  L('风口跳台','WINDY KICKERS',1,[['kickers',360],['bigair',260],['kickers',240]]),
  L('原木障碍','LUMBERJACK',1,[['cruise',150],['logs',400],['gs',320]]),
  L('冲天跳台','SKY LAUNCH',1,[['mega',360],['megajump',420],['flats',200]]),
@@ -104,7 +104,7 @@ export function course(level){const cached=courses.get(level.sections);if(cached
  for(const {s,count,rocks} of scatter)for(let i=0;i<count;i++){const z=s.z0+20+rand()*(s.z1-s.z0-40),x=(rand()-.5)*2*(WIDE-3);if(anchors.some(o=>o.type==='coin'?Math.abs(o.z-z)<6&&Math.abs(o.x-x)<3.5:o.type==='ramp'?z>o.z-o.len-15&&z<o.z+60&&Math.abs(o.x-x)<o.width/2+5:Math.abs(o.z-z)<18&&Math.abs(o.x-x)<7))continue;objects.push({type:rand()<rocks?'rock':'tree',x,z,radius:1.2+rand()*.5});}
  const out=objects.sort((a,b)=>a.z-b.z).map((o,id)=>({...o,id}));courses.set(level.sections,out);return out;}
 export class Run{
- constructor(route){this.route=route;this.ground=groundFor(route);this.objects=course(route);this.x=0;this.z=0;this.vx=0;this.speed=12;this.y=this.ground(0,0);this.vy=-pitchAt(route,0)*this.speed;this.air=false;this.airTime=0;this.height=0;this.rotation=0;this.flipRot=0;this.score=0;this.combo=0;this.bestCombo=0;this.hearts=3;this.invincible=0;this.gates=0;this.coins=0;this.tricks=0;this.moguls=0;this.mogulRun=0;this.bigAir=0;this.topSpeed=0;this.maxHeight=0;this.time=0;this.jumpCooldown=0;this.status='playing';this.section=null;this.seen=new Set();this.events=[];}
+ constructor(route){this.route=route;this.ground=groundFor(route);this.objects=course(route);this.x=0;this.z=0;this.vx=0;this.speed=18;this.y=this.ground(0,0);this.vy=-pitchAt(route,0)*this.speed;this.air=false;this.airTime=0;this.height=0;this.rotation=0;this.flipRot=0;this.score=0;this.combo=0;this.bestCombo=0;this.hearts=3;this.invincible=0;this.gates=0;this.coins=0;this.tricks=0;this.moguls=0;this.mogulRun=0;this.bigAir=0;this.topSpeed=0;this.maxHeight=0;this.time=0;this.jumpCooldown=0;this.status='playing';this.section=null;this.seen=new Set();this.events=[];}
  emit(type,text,points=0){this.events.push({type,text,points});}
  award(points,text){this.combo++;this.bestCombo=Math.max(this.combo,this.bestCombo);const n=points*Math.min(5,1+Math.floor(this.combo/4));this.score+=n;this.emit('score',text,n);}
  launch(v=9){if(this.air||this.jumpCooldown>0)return;this.air=true;this.airTime=0;this.vy+=v;this.y+=.1;this.height=.1;this.rotation=0;this.flipRot=0;this.jumpCooldown=.6;if(v>=9)this.emit('jump','起跳！');}
