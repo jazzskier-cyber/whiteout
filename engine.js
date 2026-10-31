@@ -20,10 +20,12 @@ export const KINDS={
  flats:{pitch:.06,label:'平缓雪原',tip:'坡变缓了 · 踩加速带 · 按 ↑ 团身'},
  logs:{pitch:.18,label:'原木障碍',tip:'空格跳过原木，或找缺口'},
  steep:{pitch:.36,label:'陡坡',tip:'坡度很陡 · 按 ↓ 控速'},
- cliff:{pitch:.25,label:'断崖',tip:'冲出崖边 · 空中保持平衡'}};
+ cliff:{pitch:.25,label:'断崖',tip:'冲出崖边 · 空中保持平衡'},
+ bowl:{pitch:.22,bound:42,label:'大雪碗',tip:'开阔大碗 · 冲上碗壁到顶腾空'}};
 // How far each kind of section bends (radians of heading change per bend).
-const BENDS={cruise:1.3,slalom:.9,gs:1.5,glade:.8,moguls:.6,kickers:.35,bigair:.12,megajump:0,mega:1.2,rollers:1,chute:1.1,flats:1.2,logs:.6,steep:1,cliff:.2};
+const BENDS={bowl:.4,cruise:1.3,slalom:.9,gs:1.5,glade:.8,moguls:.6,kickers:.35,bigair:.12,megajump:0,mega:1.2,rollers:1,chute:1.1,flats:1.2,logs:.6,steep:1,cliff:.2};
 export const MAX_CURVE=.0065;
+export const BOWL_DEPTH=15;
 export const MOGUL_SAFE=23,WIDE=21,G=17,TAU=Math.PI*2,MAX_SPEED=48;
 // Speed model: gravity along the slope against snow friction and air drag.
 const FRICTION=.6,DRAG=.0024,TUCK_DRAG=.0013;
@@ -32,10 +34,12 @@ export const terminalSpeed=(pitch,tuck=false)=>Math.sqrt(Math.max(0,(9.8*pitch-F
 export const GEAR={ski:{name:'双板',en:'SKI',lateral:12,latK:.25,drag:1,spin:6.5,flip:6,mogul:0},board:{name:'单板',en:'BOARD',lateral:11,latK:.21,drag:1.07,spin:7.6,flip:6.8,mogul:3}};
 export const RAMPS={kicker:{len:7,h:1.3,width:4.6},big:{len:13,h:3.4,width:7},mega:{len:24,h:8.5,width:10}};
 const L=(name,en,area,sections)=>({name,en,area,sections});
+// Difficulty 1–5 stars. Two stars is the baseline layout; every star above it adds obstacles, tightens lines and (at five) takes a heart away.
+const HARD=[2,2,2,3,2,3,3,3,4,3,4,3,4,4,5,4,5,4,5,5];
 const SPECS=[
  L('第一跳','FIRST FLIGHT',0,[['mega',320],['bigair',260],['kickers',300]]),
  L('旗门飞台','GATES TO THE SKY',0,[['slalom',280],['megajump',420],['rollers',280]]),
- L('波浪速降','ROLLER RUSH',0,[['rollers',380],['mega',360],['bigair',260]]),
+ L('波浪速降','ROLLER RUSH',0,[['rollers',300],['bowl',420],['mega',300],['bigair',260]]),
  L('松林断崖','PINE DROP',0,[['glade',360],['cliff',200],['kickers',300]]),
  L('第一道长坡','THE LONG HILL',0,[['mega',600],['megajump',420]]),
  L('风口跳台','WINDY KICKERS',1,[['kickers',360],['bigair',260],['kickers',240]]),
@@ -44,7 +48,7 @@ const SPECS=[
  L('窄谷','THE CHUTE',1,[['cruise',150],['chute',380],['steep',300],['bigair',260]]),
  L('山脊雪包','BUMP RIDGE',1,[['moguls',280],['rollers',300],['megajump',420]]),
  L('雾凇密林','RIME GLADE',2,[['glade',600],['flats',220],['bigair',260]]),
- L('林间雪包','BUMPS IN THE PINES',2,[['glade',300],['moguls',320],['glade',300]]),
+ L('雪碗林海','BOWL IN THE PINES',2,[['glade',300],['bowl',460],['moguls',320]]),
  L('断崖','THE DROP',2,[['cruise',180],['cliff',200],['mega',450],['kickers',240]]),
  L('伐木场','TIMBER RUN',2,[['logs',320],['glade',320],['logs',280],['bigair',260]]),
  L('雪崩速降','AVALANCHE RUN',2,[['mega',800],['chute',260],['megajump',420]]),
@@ -53,17 +57,17 @@ const SPECS=[
  L('双崖','DOUBLE DROP',3,[['cliff',200],['megajump',420],['cliff',200],['rollers',320]]),
  L('雪包之王','MOGUL KING',3,[['moguls',360],['gs',300],['moguls',360],['megajump',420]]),
  L('落日终章','LAST LIGHT',3,[['mega',500],['chute',260],['cliff',200],['moguls',260],['logs',260],['megajump',420]])];
-export const LEVELS=SPECS.map((s,i)=>{let z=0;const sections=[['start',90],...s.sections,['runout',90]].map(([kind,len])=>{const sec={kind,z0:z,z1:z+len,...KINDS[kind]};z+=len;return sec;});const area=AREAS[s.area];
- return {id:'l'+String(i+1).padStart(2,'0'),n:i+1,name:s.name,en:s.en,area:s.area,seed:101+i*977,length:z,sections,sky:area.sky,snow:area.snow,accent:area.accent,trees:area.trees,features:[...new Set(s.sections.map(([k])=>KINDS[k].label))]};});
+export const LEVELS=SPECS.map((s,i)=>{let z=0;const sections=[['start',90],...s.sections,['runout',90]].map(([kind,len])=>{const sec={kind,z0:z,z1:z+len,...KINDS[kind]};if(kind==='chute'&&HARD[i]>=4)sec.bound=7;z+=len;return sec;});const area=AREAS[s.area];
+ return {id:'l'+String(i+1).padStart(2,'0'),n:i+1,hard:HARD[i],hearts:HARD[i]>=5?2:3,name:s.name,en:s.en,area:s.area,seed:101+i*977,length:z,sections,sky:area.sky,snow:area.snow,accent:area.accent,trees:area.trees,features:[...new Set(s.sections.map(([k])=>KINDS[k].label))]};});
 export const ROUTES=LEVELS;
 const smoothstep=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 const CLIFF_EDGE=45,CLIFF_DROP=10;
 const profiles=new WeakMap();
 // Terrain only depends on z through precomputed 1 m tables, so physics and meshes stay cheap.
 export function profile(level){let p=profiles.get(level.sections);if(p)return p;const secs=level.sections,len=secs.at(-1).z1,n=len+1;
- const rawP=new Float32Array(n),rawB=new Float32Array(n);let k=0;for(let z=0;z<n;z++){while(k<secs.length-1&&z>=secs[k].z1)k++;rawP[z]=secs[k].pitch;rawB[z]=secs[k].bound||WIDE;}
+ const rawP=new Float32Array(n),rawB=new Float32Array(n),rawW=new Float32Array(n);let k=0;for(let z=0;z<n;z++){while(k<secs.length-1&&z>=secs[k].z1)k++;rawP[z]=secs[k].pitch;rawB[z]=secs[k].bound||WIDE;rawW[z]=secs[k].kind==='bowl'?1:0;}
  const avg=(src,w)=>{const out=new Float32Array(n);for(let z=0;z<n;z++){let s=0,c=0;for(let j=z-w;j<=z+w;j++){s+=src[Math.max(0,Math.min(n-1,j))];c++;}out[z]=s/c;}return out;};
- const P=avg(rawP,15),B=avg(rawB,20),H=new Float32Array(n);for(let z=1;z<n;z++)H[z]=H[z-1]-P[z];
+ const P=avg(rawP,15),B=avg(rawB,20),BW=avg(rawW,25),H=new Float32Array(n);for(let z=1;z<n;z++)H[z]=H[z-1]-P[z];
  for(let z=0;z<n;z++){H[z]+=Math.sin(z*.013)*1.2;for(const s of secs){if(s.kind==='cliff'&&z>=s.z0){const edge=s.z0+CLIFF_EDGE;if(z>=edge-8&&z<edge)H[z]+=.7*Math.sin(Math.PI*(z-edge+8)/8);H[z]-=CLIFF_DROP*smoothstep((z-edge)/4);}if(z<s.z0||z>s.z1)continue;const t=(z-s.z0)/(s.z1-s.z0);
   if(s.kind==='rollers')H[z]+=2.2*Math.sin(Math.PI*t)*Math.sin(TAU*(z-s.z0)/40);}}
  // Heading: each section bends left or right (long ones become S-curves), integrated into a world-space centreline.
@@ -72,11 +76,12 @@ export function profile(level){let p=profiles.get(level.sections);if(p)return p;
  const K=avg(rawK,10),TH=new Float32Array(n),PX=new Float32Array(n),PZ=new Float32Array(n);for(let z=1;z<n;z++){TH[z]=TH[z-1]+K[z];PX[z]=PX[z-1]+Math.sin(TH[z]);PZ[z]=PZ[z-1]+Math.cos(TH[z]);}
  let par=0;for(let z=0;z<len;z++)par+=1/Math.max(10,terminalSpeed(P[z]));
  for(const s of secs)if(s.kind==='cliff')s.edge=s.z0+CLIFF_EDGE;
- p={len,P,B,H,K,TH,PX,PZ,secs,par};profiles.set(level.sections,p);return p;}
+ p={len,P,B,BW,H,K,TH,PX,PZ,secs,par};profiles.set(level.sections,p);return p;}
 const lerpTable=(t,z)=>{const i=Math.floor(z),f=z-i;return t[i]+(t[i+1]-t[i])*f;};
 export function heightAt(level,z){const p=profile(level);if(z<=0)return p.H[0]-z*.15;if(z>=p.len)return p.H[p.len]-(z-p.len)*.1;return lerpTable(p.H,z);}
 export function boundAt(level,z){const p=profile(level);return z<=0?p.B[0]:z>=p.len?p.B[p.len]:lerpTable(p.B,z);}
 export function pitchAt(level,z){const p=profile(level);return z<=0?p.P[0]:z>=p.len?p.P[p.len]:lerpTable(p.P,z);}
+export function bowlAt(level,z){const p=profile(level);return z<=0||z>=p.len?0:lerpTable(p.BW,z);}
 export function curvatureAt(level,z){const p=profile(level);return z<=0||z>=p.len?0:lerpTable(p.K,z);}
 export function headingAt(level,z){const p=profile(level);return z<=0?p.TH[0]:z>=p.len?p.TH[p.len]:lerpTable(p.TH,z);}
 // Trail coordinates (x across, z along the run) to world X/Z: the centreline plus x along the lateral normal.
@@ -85,39 +90,43 @@ export function sectionAt(level,z){const secs=level.sections;for(const s of secs
 // Ramps are real curved surfaces (height grows with the square of the distance up the ramp), so the lip angle and approach speed decide the flight.
 export function rampLift(o,x,z){if(Math.abs(x-o.x)>o.width/2||z>o.z||z<o.z-o.len)return 0;const t=(z-o.z+o.len)/o.len;return o.h*t*t;}
 // Outside the lane the snow banks up into walls, which turns narrow sections into canyons.
-export function groundFor(level,withRamps=true){const base=(x,z)=>heightAt(level,z)-x*curvatureAt(level,z)*25+Math.sin(x*.08+z*.008)*.5+Math.min(12,Math.max(0,Math.abs(x)-boundAt(level,z)-1)**2*.05);if(!withRamps)return base;
- const ramps=course(level).filter(o=>o.type==='ramp');return (x,z)=>{let h=base(x,z);for(const o of ramps){if(o.z<z)continue;if(o.z-o.len>z)break;h+=rampLift(o,x,z);}return h;};}
+export function groundFor(level,withRamps=true){const cached=withRamps&&grounds.get(level.sections);if(cached)return cached;const base=(x,z)=>heightAt(level,z)-x*curvatureAt(level,z)*25+bowlAt(level,z)*BOWL_DEPTH*Math.min(1,Math.abs(x)/boundAt(level,z))**3+Math.sin(x*.08+z*.008)*.5+Math.min(12,Math.max(0,Math.abs(x)-boundAt(level,z)-1)**2*.05);if(!withRamps)return base;
+ const ramps=course(level).filter(o=>o.type==='ramp'),full=(x,z)=>{let h=base(x,z);for(const o of ramps){if(o.z<z)continue;if(o.z-o.len>z)break;h+=rampLift(o,x,z);}return h;};full.base=base;grounds.set(level.sections,full);return full;}
+const grounds=new WeakMap();
+export const extra=level=>Math.max(0,(level.hard||2)-2);
+export const gladeClear=level=>4.2-.2*extra(level);
 export function pathX(sec,z){const len=sec.z1-sec.z0,waves=Math.max(1,Math.round(len/90));return Math.min(9,(sec.bound||WIDE)-4.5)*Math.sin(Math.PI*waves*(z-sec.z0)/len)*(sec.flip||1);}
 // Where a skier leaving this ramp at speed v is, relative to the slope, t seconds after the lip.
 export function flight(o,v,t){return {z:o.z+v*t,h:o.h+2*o.h/o.len*v*t-G/2*t*t};}
 const courses=new WeakMap();
-export function course(level){const cached=courses.get(level.sections);if(cached)return cached;let seed=level.seed;const rand=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);const objects=[],scatter=[];
+export function course(level){const cached=courses.get(level.sections);if(cached)return cached;let seed=level.seed;const k=extra(level),dense=1+.35*k,narrow=1-.05*k;const rand=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);const objects=[],scatter=[];
  const ramp=(kind,x,z,expected)=>{const o={type:'ramp',kind,x,z,...RAMPS[kind]};objects.push(o);const v=Math.min(44,Math.max(16,expected));let air=0;for(let t=.1;t<6;t+=.05){if(flight(o,v,t).h<0){air=t;break;}}
   const count=kind==='mega'?10:kind==='big'?7:4;for(let j=1;j<=count;j++){const f=flight(o,v,air*j/(count+1));if(f.h>1.2)objects.push({type:'coin',x,z:f.z,air:f.h});}return o;};
  // Coins weave across the lane; gates sit on the outside of each turn.
- const snake=(s,amp,wave,{gates=true,width=6.5,gap=7,air=0,boosts=0}={})=>{const ph=rand()>.5?0:Math.PI;const X=z=>amp*Math.sin(TAU*(z-s.z0)/wave+ph);for(let z=s.z0+18;z<s.z1-12;z+=gap)objects.push({type:'coin',x:X(z),z,air});
+ const snake=(s,amp,wave,{gates=true,width=6.5*narrow,gap=7,air=0,boosts=0}={})=>{const ph=rand()>.5?0:Math.PI;const X=z=>amp*Math.sin(TAU*(z-s.z0)/wave+ph);for(let z=s.z0+18;z<s.z1-12;z+=gap)objects.push({type:'coin',x:X(z),z,air});
   if(gates)for(let z=s.z0+18+wave/4;z<s.z1-15;z+=wave/2)objects.push({type:'gate',x:X(z)*.92,z,width});if(boosts)for(let z=s.z0+40;z<s.z1-30;z+=boosts)objects.push({type:'boost',x:X(z),z,width:4});};
  level.sections.forEach((s,si)=>{const {z0,z1}=s,len=z1-z0,b=s.bound||WIDE,v=terminalSpeed(s.pitch);
   if(s.kind==='cruise'){snake(s,9,90);scatter.push({s,count:Math.round(len/24*(.5+level.trees)),rocks:.2});}
-  if(s.kind==='flats'){snake(s,8,70,{width:7,boosts:70});scatter.push({s,count:Math.round(len/30*(.5+level.trees)),rocks:.1});}
-  if(s.kind==='steep'){snake(s,10,130,{width:7});scatter.push({s,count:Math.round(len/14*(.5+level.trees)),rocks:.6});}
-  if(s.kind==='mega'){snake(s,11,160,{width:8,gap:9});scatter.push({s,count:Math.round(len/26*(.4+level.trees)),rocks:.5});}
+  if(s.kind==='flats'){snake(s,8,70,{width:7*narrow,boosts:70});scatter.push({s,count:Math.round(len/30*(.5+level.trees)),rocks:.1});}
+  if(s.kind==='steep'){snake(s,10,130,{width:7*narrow});scatter.push({s,count:Math.round(len/14*(.5+level.trees)),rocks:.6});}
+  if(s.kind==='mega'){snake(s,11,160,{width:8*narrow,gap:9});scatter.push({s,count:Math.round(len/26*(.4+level.trees)),rocks:.5});}
   if(s.kind==='rollers'){for(let z=z0+10,i=0;z<z1-10;z+=40,i++)objects.push({type:'coin',x:(i%2?1:-1)*6,z,air:2.4},{type:'coin',x:(i%2?1:-1)*6,z:z+5,air:2});for(let z=z0+30,i=0;z<z1-20;z+=80,i++)objects.push({type:'gate',x:(i%2?-1:1)*6,z,width:6.5});scatter.push({s,count:Math.round(len/26*level.trees),rocks:.2});}
-  if(s.kind==='slalom'||s.kind==='gs'){const gs=s.kind==='gs',gap=gs?42:28,w=gs?5.6:level.area>=2?4.3:4.8;let last=0;for(let z=z0+25,i=0;z<z1-15;z+=gap,i++){const x=(i%2?1:-1)*((gs?8:6)+rand()*(gs?3:2.5));objects.push({type:'gate',x,z,width:w});if(i)objects.push({type:'coin',x:(x+last)/2,z:z-gap/2});last=x;}scatter.push({s,count:Math.round(len/30*level.trees),rocks:.15});}
+  if(s.kind==='slalom'||s.kind==='gs'){const gs=s.kind==='gs',gap=gs?42:28,w=Math.max(3.8,(gs?5.6:level.area>=2?4.3:4.8)*narrow);let last=0;for(let z=z0+25,i=0;z<z1-15;z+=gap,i++){const x=(i%2?1:-1)*((gs?8:6)+rand()*(gs?3:2.5));objects.push({type:'gate',x,z,width:w});if(i)objects.push({type:'coin',x:(x+last)/2,z:z-gap/2});last=x;}scatter.push({s,count:Math.round(len/30*level.trees),rocks:.15});}
   if(s.kind==='kickers'){for(let z=z0+40,i=0;z<z1-35;z+=62,i++)ramp('kicker',(i%2?1:-1)*6,z,v);scatter.push({s,count:Math.round(len/28*level.trees),rocks:.2});}
   if(s.kind==='bigair'){const z=z0+75;ramp('big',0,z,v);for(let zz=z0+12;zz<z-16;zz+=9)for(const side of [-1,1])objects.push({type:'flag',x:side*5.4,z:zz});objects.push({type:'boost',x:0,z:z0+30,width:4});}
   if(s.kind==='megajump'){const z=z0+150;ramp('mega',0,z,v);for(let zz=z0+40;zz<z-26;zz+=10)for(const side of [-1,1])objects.push({type:'flag',x:side*6.6,z:zz,warn:zz>z-60});for(const zz of [z0+70,z0+105])objects.push({type:'boost',x:0,z:zz,width:4});}
-  if(s.kind==='glade'){s.flip=rand()>.5?1:-1;const gap=level.area>=2?3.3:4.4;for(let z=z0+10;z<z1-8;z+=gap){for(let x=-b+1.5;x<=b-1.5;x+=4.1){const tx=x+(rand()-.5)*2.2,tz=z+(rand()-.5)*1.4;if(Math.abs(tx-pathX(s,tz))<4.2)continue;objects.push({type:'tree',x:tx,z:tz,radius:.95});}}for(let z=z0+18;z<z1-10;z+=11)objects.push({type:'coin',x:pathX(s,z),z});}
-  if(s.kind==='moguls'){for(let z=z0+16,row=0;z<z1-12;z+=6.5,row++)for(let x=-b+2+(row%2)*2.1;x<=b-2;x+=4.2)objects.push({type:'mogul',x,z,r:1.55});snake(s,7,90,{gates:false,gap:10,air:1});}
-  if(s.kind==='chute'){for(let z=z0+40,i=0;z<z1-25;z+=34,i++)objects.push({type:'rock',x:(i%2?1:-1)*(3+rand()*1.8),z,radius:1.3});for(let z=z0+20,i=0;z<z1-15;z+=17,i++)objects.push({type:'coin',x:Math.sin(i*1.3)*4,z});}
-  if(s.kind==='logs'){for(let z=z0+35,i=0;z<z1-25;z+=46,i++){if(i%3===2){objects.push({type:'log',x0:-b,x1:b,x:0,z},{type:'coin',x:0,z,air:2.2});continue;}const g=(rand()-.5)*(b*1.3),half=2.4;objects.push({type:'log',x0:-b,x1:g-half,x:(g-half-b)/2,z},{type:'log',x0:g+half,x1:b,x:(g+half+b)/2,z},{type:'coin',x:g,z},{type:'coin',x:g*.5,z:z+23});}}
+  if(s.kind==='glade'){s.flip=rand()>.5?1:-1;const gap=Math.max(2.7,(level.area>=2?3.3:4.4)-.3*k),clear=gladeClear(level);for(let z=z0+10;z<z1-8;z+=gap){for(let x=-b+1.5;x<=b-1.5;x+=4.1){const tx=x+(rand()-.5)*2.2,tz=z+(rand()-.5)*1.4;if(Math.abs(tx-pathX(s,tz))<clear)continue;objects.push({type:'tree',x:tx,z:tz,radius:.95});}}for(let z=z0+18;z<z1-10;z+=11)objects.push({type:'coin',x:pathX(s,z),z});}
+  if(s.kind==='moguls'){for(let z=z0+16,row=0;z<z1-12;z+=6.5-.35*k,row++)for(let x=-b+2+(row%2)*2.1;x<=b-2;x+=4.2)objects.push({type:'mogul',x,z,r:1.55});snake(s,7,90,{gates:false,gap:10,air:1});}
+  if(s.kind==='chute'){for(let z=z0+40,i=0;z<z1-25;z+=34-3*k,i++)objects.push({type:'rock',x:(i%2?1:-1)*(3+rand()*1.8),z,radius:1.3});for(let z=z0+20,i=0;z<z1-15;z+=17,i++)objects.push({type:'coin',x:Math.sin(i*1.3)*4,z});}
+  if(s.kind==='logs'){for(let z=z0+35,i=0;z<z1-25;z+=46,i++){if(k>=2?i%2===1:i%3===2){objects.push({type:'log',x0:-b,x1:b,x:0,z},{type:'coin',x:0,z,air:2.2});continue;}const g=(rand()-.5)*(b*1.3),half=2.4;objects.push({type:'log',x0:-b,x1:g-half,x:(g-half-b)/2,z},{type:'log',x0:g+half,x1:b,x:(g+half+b)/2,z},{type:'coin',x:g,z},{type:'coin',x:g*.5,z:z+23});}}
+  if(s.kind==='bowl'){for(let z=z0+40,i=0;z<z1-30;z+=38,i++){const side=i%2?1:-1;objects.push({type:'coin',x:side*(b-7),z},{type:'coin',x:side*(b-3),z:z+5},{type:'coin',x:side*(b-.5),z:z+10,air:3.5},{type:'coin',x:side*(b-.5),z:z+14,air:6});}for(let z=z0+25;z<z1-15;z+=19)objects.push({type:'coin',x:0,z});}
   if(s.kind==='cliff'){const edge=z0+CLIFF_EDGE;for(let zz=edge-26;zz<edge-4;zz+=7)for(const side of [-1,1])objects.push({type:'flag',x:side*6,z:zz,warn:true});for(let j=0;j<5;j++)objects.push({type:'coin',x:0,z:edge+6+j*6,air:CLIFF_DROP*(1-((j+1)/6)**2)});snake({z0:edge+50,z1},9,70,{gates:false,gap:12});}
  });
  const anchors=objects.filter(o=>['gate','ramp','log','boost','coin'].includes(o.type));
- for(const {s,count,rocks} of scatter)for(let i=0;i<count;i++){const z=s.z0+20+rand()*(s.z1-s.z0-40),x=(rand()-.5)*2*(WIDE-3);if(anchors.some(o=>o.type==='coin'?Math.abs(o.z-z)<6&&Math.abs(o.x-x)<3.5:o.type==='ramp'?z>o.z-o.len-15&&z<o.z+60&&Math.abs(o.x-x)<o.width/2+5:Math.abs(o.z-z)<18&&Math.abs(o.x-x)<7))continue;objects.push({type:rand()<rocks?'rock':'tree',x,z,radius:1.2+rand()*.5});}
+ for(const {s,count,rocks} of scatter)for(let i=0;i<Math.round(count*dense);i++){const z=s.z0+20+rand()*(s.z1-s.z0-40),x=(rand()-.5)*2*(WIDE-3);if(anchors.some(o=>o.type==='coin'?Math.abs(o.z-z)<6&&Math.abs(o.x-x)<3.5:o.type==='ramp'?z>o.z-o.len-15&&z<o.z+60&&Math.abs(o.x-x)<o.width/2+5:Math.abs(o.z-z)<18&&Math.abs(o.x-x)<7))continue;objects.push({type:rand()<rocks+.08*k?'rock':'tree',x,z,radius:1.2+rand()*.5});}
  const out=objects.sort((a,b)=>a.z-b.z).map((o,id)=>({...o,id}));courses.set(level.sections,out);return out;}
 export class Run{
- constructor(route,gear='ski'){this.route=route;this.gear=GEAR[gear]?gear:'ski';this.kit=GEAR[this.gear];this.mogulSafe=MOGUL_SAFE+this.kit.mogul;this.ground=groundFor(route);this.objects=course(route);this.x=0;this.z=0;this.vx=0;this.speed=18;this.y=this.ground(0,0);this.vy=-pitchAt(route,0)*this.speed;this.air=false;this.airTime=0;this.height=0;this.rotation=0;this.flipRot=0;this.score=0;this.combo=0;this.bestCombo=0;this.hearts=3;this.invincible=0;this.gates=0;this.coins=0;this.tricks=0;this.moguls=0;this.mogulRun=0;this.bigAir=0;this.topSpeed=0;this.maxHeight=0;this.time=0;this.jumpCooldown=0;this.status='playing';this.section=null;this.seen=new Set();this.events=[];}
+ constructor(route,gear='ski'){this.route=route;this.gear=GEAR[gear]?gear:'ski';this.kit=GEAR[this.gear];this.mogulSafe=MOGUL_SAFE+this.kit.mogul;this.ground=groundFor(route);this.objects=course(route);this.x=0;this.z=0;this.vx=0;this.speed=18;this.y=this.ground(0,0);this.vy=-pitchAt(route,0)*this.speed;this.air=false;this.airTime=0;this.height=0;this.rotation=0;this.flipRot=0;this.score=0;this.combo=0;this.bestCombo=0;this.hearts=3;this.invincible=0;this.maxHearts=route.hearts||3;this.hearts=this.maxHearts;this.gates=0;this.coins=0;this.tricks=0;this.moguls=0;this.mogulRun=0;this.bigAir=0;this.topSpeed=0;this.maxHeight=0;this.time=0;this.jumpCooldown=0;this.status='playing';this.section=null;this.seen=new Set();this.events=[];}
  emit(type,text,points=0){this.events.push({type,text,points});}
  award(points,text){this.combo++;this.bestCombo=Math.max(this.combo,this.bestCombo);const n=points*Math.min(5,1+Math.floor(this.combo/4));this.score+=n;this.emit('score',text,n);}
  launch(v=9){if(this.air||this.jumpCooldown>0)return;this.air=true;this.airTime=0;this.vy+=v;this.y+=.1;this.height=.1;this.rotation=0;this.flipRot=0;this.jumpCooldown=.6;if(v>=9)this.emit('jump','起跳！');}
@@ -125,6 +134,7 @@ export class Run{
   const spins=Math.floor((this.rotation+.3)/TAU),flips=Math.floor((this.flipRot+.3)/TAU),clean=spins||flips||this.rotation<=1.5&&this.flipRot<=1.2;
   if(spins||flips){this.tricks+=spins+flips;const mix=spins&&flips?1.5:1,name=[flips?`${flips>1?flips+' 周':''}后空翻`:'',spins?`${spins*360}°`:''].filter(Boolean).join(' + ');this.award(Math.round((spins*350+flips*550)*mix),`${name} 落地${mix>1?' · 组合 ×1.5':''}`);}
   else if(!clean){this.combo=0;this.speed*=.6;this.emit('miss','没转满 · 落地失衡');}else if(air>.5)this.emit('land','稳稳落地');
+  if(this.wallAir&&clean&&air>.5){this.walls=(this.walls||0)+1;this.award(200,'碗壁腾空');}this.wallAir=false;
   if(air>1.1&&clean){this.bigAir++;this.award(Math.round(air*air*90),air>2.5?`超级滞空 ${air.toFixed(1)}s`:`滞空 ${air.toFixed(1)}s`);}this.rotation=0;this.flipRot=0;}
  step(dt,input={}){
   if(this.status!=='playing')return;dt=Math.min(.05,Math.max(0,dt));this.time+=dt;this.invincible=Math.max(0,this.invincible-dt);this.jumpCooldown=Math.max(0,this.jumpCooldown-dt);
@@ -134,12 +144,12 @@ export class Run{
   if(input.brake&&!this.air)a-=sec.kind==='moguls'?(v>this.mogulSafe-3?7:0):9;
   this.speed=Math.max(6,Math.min(MAX_SPEED,v+a*dt));this.topSpeed=Math.max(this.topSpeed,this.speed);
   const lateral=this.kit.lateral+this.speed*this.kit.latK,curve=curvatureAt(this.route,this.z),push=-curve*this.speed*this.speed;if(this.air)this.vx+=push*.5*dt;else this.vx+=(steer*lateral*(input.brake?.75:1)+push*.09-this.vx)*Math.min(1,dt*5);if(this.air)this.vx+=(steer*lateral-this.vx)*Math.min(1,dt*1.5);const prevX=this.x;this.x+=this.vx*dt;
-  const bound=boundAt(this.route,this.z);if(Math.abs(this.x)>bound){this.x=Math.sign(this.x)*bound;this.vx*=-.3;this.speed*=.98;}
+  const bound=boundAt(this.route,this.z);if(Math.abs(this.x)>bound){this.x=Math.sign(this.x)*bound;this.vx*=sec.kind==='bowl'?-.15:-.3;if(sec.kind!=='bowl')this.speed*=.98;}
   if(input.jump)this.launch();const prev=this.z;this.z+=this.speed*dt;
   // Vertical motion is absolute, so ramp lips, rollers and cliff edges throw the skier into the air naturally.
   let g=this.ground(this.x,this.z);
   if(!this.air&&g-this.y>.45){this.x=prevX;this.vx*=-.4;this.speed*=.97;g=this.ground(this.x,this.z);this.emit('bump','被跳台侧壁挡住');}
-  if(!this.air){const vg=(g-this.ground(this.x,prev))/dt;if((vg-this.vy)/dt<-G*1.05&&this.speed>10){this.air=true;this.airTime=0;this.rotation=0;this.flipRot=0;this.vy-=G*dt;this.y+=this.vy*dt;}else{this.vy=vg;this.y=g;}}
+  if(!this.air){const base=this.ground.base,vg=(g-this.ground(this.x,prev))/dt+(base(this.x,this.z)-base(prevX,this.z))/dt;if((vg-this.vy)/dt<-G*1.05&&this.speed>10){this.air=true;this.airTime=0;this.rotation=0;this.flipRot=0;this.wallAir=sec.kind==='bowl'&&Math.abs(this.x)>=bound-.6;this.vy-=G*dt;this.y+=this.vy*dt;}else{this.vy=vg;this.y=g;const base=this.ground.base,side=(base(this.x+.5,this.z)-base(this.x-.5,this.z));this.vx-=side*9.8*.6*dt;}}
   else{this.airTime+=dt;this.vy-=G*dt;this.y+=this.vy*dt;if(input.trick)this.rotation+=dt*this.kit.spin;if(input.flip)this.flipRot+=dt*this.kit.flip;if(this.y<=g)this.land(g);}
   this.height=Math.max(0,this.y-g);this.maxHeight=Math.max(this.maxHeight,this.height);
   for(const o of this.objects){if(this.seen.has(o.id)||o.z<prev-4||o.z>this.z+3)continue;const d=Math.abs(this.x-o.x),crossed=prev<o.z&&this.z>=o.z;

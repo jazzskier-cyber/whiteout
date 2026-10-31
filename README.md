@@ -17,6 +17,10 @@ Speed is physical: gravity along the section pitch against snow friction and air
 
 Runs bend: each section turns left or right (long ones become S-curves, jump sections stay nearly straight). Physics stays in trail coordinates; the renderer bends everything onto a world-space centreline (`toWorld`). In a bend you are pushed to the outside and must lean in, and the outside edge is banked.
 
+Big bowls (levels 3 and 12) widen the lane to 84 m between 15 m walls that rise steepest at the rim. Slope pulls you back to the bottom, so you can swing wall to wall, and reaching the rim at speed launches a wall air (bonus on a clean landing).
+
+Each level has a 1–5 star difficulty (`HARD` in `engine.js`). Two stars is the baseline layout. Each extra star adds about 35% more trees and rocks and more rocks in the mix, and makes gates 5% narrower. It also tightens forest rows and lanes, packs moguls closer, adds more full-width logs and narrows chutes to 14 m. Five-star levels give you only 2 hearts.
+
 Choose skis (faster, sharper turns) or a snowboard (faster spins and flips, floats over moguls, slightly lower top speed) on the menu; the choice is remembered.
 
 Moguls pop you into the air above 83 km/h; hold ↓ to absorb them (every six in a row is a rhythm bonus). Level n unlocks after finishing level n−1. Progress is stored in `whiteout-progress-v2`, and best scores per level in `whiteout-best-l01`…`l20`.
@@ -25,6 +29,6 @@ Moguls pop you into the air above 83 km/h; hold ↓ to absorb them (every six in
 
 The fixed 120 Hz simulation is separate from rendering. Terrain, trees, skier, mountains, flags and ramps are procedural geometry; trees are instanced. Snow spray, ski tracks, chase camera, speed FOV and optional synthesized effects provide feedback. Reduced-motion preference disables speed FOV changes. WebGL 2 is required; startup shows a fallback error when unavailable.
 
-Validation: 19 simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement). Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Mobile controls are implemented but have not had a physical-device playtest.
+Validation: 21 simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement). Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Mobile controls are implemented but have not had a physical-device playtest.
 
 Not yet published to AIWANNA.
