@@ -15,12 +15,16 @@ Each level is a sequence of terrain sections (`engine.js` `SPECS`): cruise, slal
 
 Speed is physical: gravity along the section pitch against snow friction and air drag (`terminalSpeed`). Flats settle around 40 km/h, giant slopes pass 140 km/h, and tucking (↑) cuts drag. Ramps are real curved surfaces with the same shape in physics and rendering, so approach speed decides the flight: kickers give about 3 m, big air about 10 m, mega jumps 30 m+ and over 3 s of air. Pressing Space at the lip adds a pop. Hold F to spin and G to backflip; spin plus flip lands as a ×1.5 combo. Coins weave in S-curves with gates on the outside of each turn, and coin arcs trace each ramp's flight path. Ramp sides block you instead of costing a heart.
 
+Runs bend: each section turns left or right (long ones become S-curves, jump sections stay nearly straight). Physics stays in trail coordinates; the renderer bends everything onto a world-space centreline (`toWorld`). In a bend you are pushed to the outside and must lean in, and the outside edge is banked.
+
+Choose skis (faster, sharper turns) or a snowboard (faster spins and flips, floats over moguls, slightly lower top speed) on the menu; the choice is remembered.
+
 Moguls pop you into the air above 83 km/h; hold ↓ to absorb them (every six in a row is a rhythm bonus). Level n unlocks after finishing level n−1. Progress is stored in `whiteout-progress-v2`, and best scores per level in `whiteout-best-l01`…`l20`.
 
 `tests/bot.js` is a look-ahead line picker; the tests use it to prove every level can be finished. Other tests cover ground continuity, clear glade lanes, the speed model, mega vs kicker flight, ramp side blocking, backflip combos, mogul pop/absorb, cliff airtime, logs and chute width.
 
 The fixed 120 Hz simulation is separate from rendering. Terrain, trees, skier, mountains, flags and ramps are procedural geometry; trees are instanced. Snow spray, ski tracks, chase camera, speed FOV and optional synthesized effects provide feedback. Reduced-motion preference disables speed FOV changes. WebGL 2 is required; startup shows a fallback error when unavailable.
 
-Validation: 18 simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement). Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Mobile controls are implemented but have not had a physical-device playtest.
+Validation: 19 simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement). Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Mobile controls are implemented but have not had a physical-device playtest.
 
 Not yet published to AIWANNA.

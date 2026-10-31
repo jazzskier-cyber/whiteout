@@ -1,6 +1,6 @@
 import {Run,boundAt,sectionAt,pathX} from '../engine.js';
 // A simple look-ahead line picker used to prove every level is finishable without tricks.
-export function playBot(level,{seconds=240}={}){const r=new Run(level),ramps=r.objects.filter(o=>o.type==='ramp');let target=0;
+export function playBot(level,{seconds=240,gear='ski'}={}){const r=new Run(level,gear),ramps=r.objects.filter(o=>o.type==='ramp');let target=0;
  for(let i=0;i<seconds*120&&r.status==='playing';i++){
   if(i%6===0){const b=boundAt(level,r.z)-.6,ahead=r.objects.filter(o=>o.z>r.z-1&&o.z<r.z+34&&!r.seen.has(o.id));let best=null;
    for(let x=-b;x<=b;x+=.5){let cost=Math.abs(x-r.x)*.08;for(const o of ahead){const dz=o.z-r.z,w=Math.exp(-Math.max(0,dz-3)/9);
