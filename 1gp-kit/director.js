@@ -2,7 +2,7 @@
 // A shadow copy of the simulation only decides which keys to press; nothing in the game is changed.
 (async()=>{
 const {LEVELS,Run,boundAt,sectionAt}=await import(new URL('engine.js',location.href));
-const FPS=30,SECONDS=26,W=REC.width,H=REC.height;
+const FPS=30,SECONDS=30,W=REC.width,H=REC.height;
 const out=document.createElement('canvas');out.width=W;out.height=H;const ctx=out.getContext('2d'),world=document.querySelector('#world');
 const shadow=new Run(LEVELS[0],'ski'),ramps=shadow.objects.filter(o=>o.type==='ramp');
 const held=new Set(),setKey=(key,on)=>{if(on===held.has(key))return;on?held.add(key):held.delete(key);window.dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{key,bubbles:true}));};
@@ -26,6 +26,6 @@ function draw(t){ctx.drawImage(world,0,0,W,H);ctx.save();ctx.fillStyle='#123a4c'
 await document.fonts.ready;
 REC.run({fps:FPS,seconds:SECONDS,canvas:out,
  async setup(){document.querySelector('#start').click();REC.log('started: '+text('#route-label'));},
- async step(i,t){const c=controls(shadow);for(let k=0;k<4;k++)shadow.step(1/120,c);await REC.advance(1000/FPS);draw(t);if(i%FPS===0)REC.log(`t=${Math.round(t)} real=${text('#distance')} shadow=${Math.floor(shadow.z)} v=${text('#speed')} hearts=${shadow.hearts} score=${text('#score')}`);
+ async step(i,t){if(shadow.status==='playing'){const c=controls(shadow);for(let k=0;k<4;k++)shadow.step(1/120,c);}else for(const k of [...held])setKey(k,false);await REC.advance(1000/FPS);draw(t);if(i%FPS===0)REC.log(`t=${Math.round(t)} real=${text('#distance')} shadow=${Math.floor(shadow.z)} v=${text('#speed')} hearts=${shadow.hearts} score=${text('#score')}`);
   if(i===Math.round(SECONDS*FPS)-1)for(const k of [...held])setKey(k,false);}});
 })().catch(e=>REC.log("director failed: "+e.stack));

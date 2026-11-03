@@ -1,6 +1,6 @@
-// AIWANNA board "mountain-total-v1": the sum of a player's best score on each of the 20 runs. The platform keeps only the best single submission, so the game adds up and submits the total.
+// AIWANNA board "mountain-total-v2": the sum of a player's best score on each of the 50 runs. The platform keeps only the best single submission, so the game adds up and submits the total.
 // Scores are client-reported casual competition. Opened outside AIWANNA, the game never contacts the platform.
-export const BOARD={gameId:'b1309400-5f5b-480c-b975-89cccf2ccdd4',gameSlug:'dfd0c8790b37cccbc089d967729cb6fc-834902d8',boardId:'fba50649-2dce-471e-92c7-716e9a006704',minScore:1,maxScore:10000000,origin:'https://www.aiwanna.games',origins:['https://www.aiwanna.games','https://aiwanna.games','https://www.ai-made.games','https://ai-made.games','https://1gp-game-platform.vercel.app']};
+export const BOARD={gameId:'b1309400-5f5b-480c-b975-89cccf2ccdd4',gameSlug:'dfd0c8790b37cccbc089d967729cb6fc-834902d8',boardId:'2638b981-b24f-4321-84d0-6aca9fe9fbea',minScore:1,maxScore:10000000,origin:'https://www.aiwanna.games',origins:['https://www.aiwanna.games','https://aiwanna.games','https://www.ai-made.games','https://ai-made.games','https://1gp-game-platform.vercel.app']};
 export function requestSession(win=window,config=BOARD){
  if(win.parent===win)return Promise.reject(Error('standalone'));
  return new Promise((resolve,reject)=>{const requestId=crypto.randomUUID();
