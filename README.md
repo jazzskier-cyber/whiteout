@@ -29,7 +29,7 @@ Moguls pop you into the air above 83 km/h; hold ↓ to absorb them (every six in
 
 The fixed 120 Hz simulation is separate from rendering. Terrain, trees, skier, mountains, flags and ramps are procedural geometry; trees are instanced. Snow spray, ski tracks, chase camera, speed FOV and optional synthesized effects provide feedback. Reduced-motion preference disables speed FOV changes. WebGL 2 is required; startup shows a fallback error when unavailable.
 
-Validation: simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement), language-file tests and leaderboard client tests against a fake server. Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Mobile controls are implemented but have not had a physical-device playtest.
+Validation: simulation tests (see above plus gates, collision protection, ramp/spin landing, braking/bounds/finish and failure settlement), language-file tests and leaderboard client tests against a fake server. Headless Chrome screenshots checked the level select (desktop and phone width), moguls, glade, logs, chute, cliff and big air. Desktop Chrome rendered the 3D menu and gameplay successfully. Touch controls were playtested by the author on a phone in portrait, including the long-press fix in 1.1.1.
 
 ## AIWANNA
 
