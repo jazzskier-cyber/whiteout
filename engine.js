@@ -1,27 +1,27 @@
 export const AREAS=[
- {id:'valley',name:'云杉谷',en:'SPRUCE VALLEY',sky:0xc3e3eb,snow:0xf1f8fa,accent:'#187e87',trees:.5},
- {id:'ridge',name:'风口山脊',en:'WINDY RIDGE',sky:0xbdd5f0,snow:0xe9f1ff,accent:'#5b6fc2',trees:.7},
- {id:'woods',name:'雾凇林海',en:'RIME WOODS',sky:0xcfe2da,snow:0xf3f8f3,accent:'#3b7d5c',trees:1},
- {id:'peak',name:'落日峰顶',en:'LAST LIGHT PEAK',sky:0xf5d4bb,snow:0xfff0e5,accent:'#c16c48',trees:.8}];
+ {id:'valley',en:'SPRUCE VALLEY',sky:0xc3e3eb,snow:0xf1f8fa,accent:'#187e87',trees:.5},
+ {id:'ridge',en:'WINDY RIDGE',sky:0xbdd5f0,snow:0xe9f1ff,accent:'#5b6fc2',trees:.7},
+ {id:'woods',en:'RIME WOODS',sky:0xcfe2da,snow:0xf3f8f3,accent:'#3b7d5c',trees:1},
+ {id:'peak',en:'LAST LIGHT PEAK',sky:0xf5d4bb,snow:0xfff0e5,accent:'#c16c48',trees:.8}];
 // Section kinds: pitch (drop per metre) drives gravity speed, bound is the half-width of the skiable lane.
 export const KINDS={
  start:{pitch:.3},runout:{pitch:.1},
- cruise:{pitch:.17,label:'巡航雪道',tip:'跟着雪晶的 S 弯 · 穿旗门攒连击'},
- slalom:{pitch:.22,label:'回转旗门',tip:'旗门左右交错 · 提前转弯'},
- gs:{pitch:.34,label:'大回转',tip:'高速大弯 · 提前切换方向'},
- glade:{pitch:.22,bound:17,label:'林间小道',tip:'跟着雪晶穿过树林'},
- moguls:{pitch:.24,label:'雪包区',tip:'太快会被弹起 · 按住 ↓ 屈膝吸收'},
- kickers:{pitch:.22,label:'跳台群',tip:'冲上跳台 · 按住 F 转体 · G 后空翻'},
- bigair:{pitch:.28,label:'大跳台',tip:'全速冲台 · 台边按空格跳得更高'},
- megajump:{pitch:.42,label:'超级跳台',tip:'越快飞越高 · 空中转体加后空翻'},
- mega:{pitch:.47,label:'巨型长坡',tip:'一路加速 · 按 ↑ 团身冲刺'},
- rollers:{pitch:.2,label:'波浪雪道',tip:'高速冲过坡顶会自然腾空'},
- chute:{pitch:.32,bound:8,label:'窄谷',tip:'雪道变窄 · 绕开岩石'},
- flats:{pitch:.06,label:'平缓雪原',tip:'坡变缓了 · 踩加速带 · 按 ↑ 团身'},
- logs:{pitch:.18,label:'原木障碍',tip:'空格跳过原木，或找缺口'},
- steep:{pitch:.36,label:'陡坡',tip:'坡度很陡 · 按 ↓ 控速'},
- cliff:{pitch:.25,label:'断崖',tip:'冲出崖边 · 空中保持平衡'},
- bowl:{pitch:.22,bound:42,label:'大雪碗',tip:'开阔大碗 · 冲上碗壁到顶腾空'}};
+ cruise:{pitch:.17,label:'sec.cruise',tip:'tip.cruise'},
+ slalom:{pitch:.22,label:'sec.slalom',tip:'tip.slalom'},
+ gs:{pitch:.34,label:'sec.gs',tip:'tip.gs'},
+ glade:{pitch:.22,bound:17,label:'sec.glade',tip:'tip.glade'},
+ moguls:{pitch:.24,label:'sec.moguls',tip:'tip.moguls'},
+ kickers:{pitch:.22,label:'sec.kickers',tip:'tip.kickers'},
+ bigair:{pitch:.28,label:'sec.bigair',tip:'tip.bigair'},
+ megajump:{pitch:.42,label:'sec.megajump',tip:'tip.megajump'},
+ mega:{pitch:.47,label:'sec.mega',tip:'tip.mega'},
+ rollers:{pitch:.2,label:'sec.rollers',tip:'tip.rollers'},
+ chute:{pitch:.32,bound:8,label:'sec.chute',tip:'tip.chute'},
+ flats:{pitch:.06,label:'sec.flats',tip:'tip.flats'},
+ logs:{pitch:.18,label:'sec.logs',tip:'tip.logs'},
+ steep:{pitch:.36,label:'sec.steep',tip:'tip.steep'},
+ cliff:{pitch:.25,label:'sec.cliff',tip:'tip.cliff'},
+ bowl:{pitch:.22,bound:42,label:'sec.bowl',tip:'tip.bowl'}};
 // How far each kind of section bends (radians of heading change per bend).
 const BENDS={bowl:.4,cruise:1.3,slalom:.9,gs:1.5,glade:.8,moguls:.6,kickers:.35,bigair:.12,megajump:0,mega:1.2,rollers:1,chute:1.1,flats:1.2,logs:.6,steep:1,cliff:.2};
 export const MAX_CURVE=.0065;
@@ -31,34 +31,34 @@ export const MOGUL_SAFE=23,WIDE=21,G=17,TAU=Math.PI*2,MAX_SPEED=48;
 const FRICTION=.6,DRAG=.0024,TUCK_DRAG=.0013;
 export const terminalSpeed=(pitch,tuck=false)=>Math.sqrt(Math.max(0,(9.8*pitch-FRICTION)/(tuck?TUCK_DRAG:DRAG)));
 // Gear changes handling: skis carve faster and tighter, a snowboard spins and flips faster and floats over moguls.
-export const GEAR={ski:{name:'双板',en:'SKI',lateral:12,latK:.25,drag:1,spin:6.5,flip:6,mogul:0},board:{name:'单板',en:'BOARD',lateral:11,latK:.21,drag:1.07,spin:7.6,flip:6.8,mogul:3}};
+export const GEAR={ski:{en:'SKI',lateral:12,latK:.25,drag:1,spin:6.5,flip:6,mogul:0},board:{en:'BOARD',lateral:11,latK:.21,drag:1.07,spin:7.6,flip:6.8,mogul:3}};
 export const RAMPS={kicker:{len:7,h:1.3,width:4.6},big:{len:13,h:3.4,width:7},mega:{len:24,h:8.5,width:10}};
-const L=(name,en,area,sections)=>({name,en,area,sections});
+const L=(en,area,sections)=>({en,area,sections});
 // Difficulty 1–5 stars. Two stars is the baseline layout; every star above it adds obstacles, tightens lines and (at five) takes a heart away.
 const HARD=[2,2,2,3,2,3,3,3,4,3,4,3,4,4,5,4,5,4,5,5];
 const SPECS=[
- L('第一跳','FIRST FLIGHT',0,[['mega',320],['bigair',260],['kickers',300]]),
- L('旗门飞台','GATES TO THE SKY',0,[['slalom',280],['megajump',420],['rollers',280]]),
- L('波浪速降','ROLLER RUSH',0,[['rollers',300],['bowl',420],['mega',300],['bigair',260]]),
- L('松林断崖','PINE DROP',0,[['glade',360],['cliff',200],['kickers',300]]),
- L('第一道长坡','THE LONG HILL',0,[['mega',600],['megajump',420]]),
- L('风口跳台','WINDY KICKERS',1,[['kickers',360],['bigair',260],['kickers',240]]),
- L('原木障碍','LUMBERJACK',1,[['cruise',150],['logs',400],['gs',320]]),
- L('冲天跳台','SKY LAUNCH',1,[['mega',360],['megajump',420],['flats',200]]),
- L('窄谷','THE CHUTE',1,[['cruise',150],['chute',380],['steep',300],['bigair',260]]),
- L('山脊雪包','BUMP RIDGE',1,[['moguls',280],['rollers',300],['megajump',420]]),
- L('雾凇密林','RIME GLADE',2,[['glade',600],['flats',220],['bigair',260]]),
- L('雪碗林海','BOWL IN THE PINES',2,[['glade',300],['bowl',460],['moguls',320]]),
- L('断崖','THE DROP',2,[['cruise',180],['cliff',200],['mega',450],['kickers',240]]),
- L('伐木场','TIMBER RUN',2,[['logs',320],['glade',320],['logs',280],['bigair',260]]),
- L('雪崩速降','AVALANCHE RUN',2,[['mega',800],['chute',260],['megajump',420]]),
- L('极速平原','SPEED FLATS',3,[['flats',300],['mega',420],['flats',260],['megajump',420]]),
- L('大回转','GIANT SLALOM',3,[['gs',700],['steep',300],['bigair',260]]),
- L('双崖','DOUBLE DROP',3,[['cliff',200],['megajump',420],['cliff',200],['rollers',320]]),
- L('雪包之王','MOGUL KING',3,[['moguls',360],['gs',300],['moguls',360],['megajump',420]]),
- L('落日终章','LAST LIGHT',3,[['mega',500],['chute',260],['cliff',200],['moguls',260],['logs',260],['megajump',420]])];
+ L('FIRST FLIGHT',0,[['mega',320],['bigair',260],['kickers',300]]),
+ L('GATES TO THE SKY',0,[['slalom',280],['megajump',420],['rollers',280]]),
+ L('ROLLER RUSH',0,[['rollers',300],['bowl',420],['mega',300],['bigair',260]]),
+ L('PINE DROP',0,[['glade',360],['cliff',200],['kickers',300]]),
+ L('THE LONG HILL',0,[['mega',600],['megajump',420]]),
+ L('WINDY KICKERS',1,[['kickers',360],['bigair',260],['kickers',240]]),
+ L('LUMBERJACK',1,[['cruise',150],['logs',400],['gs',320]]),
+ L('SKY LAUNCH',1,[['mega',360],['megajump',420],['flats',200]]),
+ L('THE CHUTE',1,[['cruise',150],['chute',380],['steep',300],['bigair',260]]),
+ L('BUMP RIDGE',1,[['moguls',280],['rollers',300],['megajump',420]]),
+ L('RIME GLADE',2,[['glade',600],['flats',220],['bigair',260]]),
+ L('BOWL IN THE PINES',2,[['glade',300],['bowl',460],['moguls',320]]),
+ L('THE DROP',2,[['cruise',180],['cliff',200],['mega',450],['kickers',240]]),
+ L('TIMBER RUN',2,[['logs',320],['glade',320],['logs',280],['bigair',260]]),
+ L('AVALANCHE RUN',2,[['mega',800],['chute',260],['megajump',420]]),
+ L('SPEED FLATS',3,[['flats',300],['mega',420],['flats',260],['megajump',420]]),
+ L('GIANT SLALOM',3,[['gs',700],['steep',300],['bigair',260]]),
+ L('DOUBLE DROP',3,[['cliff',200],['megajump',420],['cliff',200],['rollers',320]]),
+ L('MOGUL KING',3,[['moguls',360],['gs',300],['moguls',360],['megajump',420]]),
+ L('LAST LIGHT',3,[['mega',500],['chute',260],['cliff',200],['moguls',260],['logs',260],['megajump',420]])];
 export const LEVELS=SPECS.map((s,i)=>{let z=0;const sections=[['start',90],...s.sections,['runout',90]].map(([kind,len])=>{const sec={kind,z0:z,z1:z+len,...KINDS[kind]};if(kind==='chute'&&HARD[i]>=4)sec.bound=7;z+=len;return sec;});const area=AREAS[s.area];
- return {id:'l'+String(i+1).padStart(2,'0'),n:i+1,hard:HARD[i],hearts:HARD[i]>=5?2:3,name:s.name,en:s.en,area:s.area,seed:101+i*977,length:z,sections,sky:area.sky,snow:area.snow,accent:area.accent,trees:area.trees,features:[...new Set(s.sections.map(([k])=>KINDS[k].label))]};});
+ return {id:'l'+String(i+1).padStart(2,'0'),n:i+1,hard:HARD[i],hearts:HARD[i]>=5?2:3,en:s.en,area:s.area,seed:101+i*977,length:z,sections,sky:area.sky,snow:area.snow,accent:area.accent,trees:area.trees,features:[...new Set(s.sections.map(([k])=>KINDS[k].label))]};});
 export const ROUTES=LEVELS;
 const smoothstep=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 const CLIFF_EDGE=45,CLIFF_DROP=10;
@@ -127,18 +127,19 @@ export function course(level){const cached=courses.get(level.sections);if(cached
  const out=objects.sort((a,b)=>a.z-b.z).map((o,id)=>({...o,id}));courses.set(level.sections,out);return out;}
 export class Run{
  constructor(route,gear='ski'){this.route=route;this.gear=GEAR[gear]?gear:'ski';this.kit=GEAR[this.gear];this.mogulSafe=MOGUL_SAFE+this.kit.mogul;this.ground=groundFor(route);this.objects=course(route);this.x=0;this.z=0;this.vx=0;this.speed=18;this.y=this.ground(0,0);this.vy=-pitchAt(route,0)*this.speed;this.air=false;this.airTime=0;this.height=0;this.rotation=0;this.flipRot=0;this.score=0;this.combo=0;this.bestCombo=0;this.hearts=3;this.invincible=0;this.maxHearts=route.hearts||3;this.hearts=this.maxHearts;this.gates=0;this.coins=0;this.tricks=0;this.moguls=0;this.mogulRun=0;this.bigAir=0;this.topSpeed=0;this.maxHeight=0;this.time=0;this.jumpCooldown=0;this.status='playing';this.section=null;this.seen=new Set();this.events=[];}
- emit(type,text,points=0){this.events.push({type,text,points});}
- award(points,text){this.combo++;this.bestCombo=Math.max(this.combo,this.bestCombo);const n=points*Math.min(5,1+Math.floor(this.combo/4));this.score+=n;this.emit('score',text,n);}
- launch(v=9){if(this.air||this.jumpCooldown>0)return;this.air=true;this.airTime=0;this.vy+=v;this.y+=.1;this.height=.1;this.rotation=0;this.flipRot=0;this.jumpCooldown=.6;if(v>=9)this.emit('jump','起跳！');}
+ // Events carry i18n keys and parameters, never display text.
+ emit(type,key,points=0,params={}){this.events.push({type,key,points,params});}
+ award(points,key,params={}){this.combo++;this.bestCombo=Math.max(this.combo,this.bestCombo);const n=points*Math.min(5,1+Math.floor(this.combo/4));this.score+=n;this.emit('score',key,n,params);}
+ launch(v=9){if(this.air||this.jumpCooldown>0)return;this.air=true;this.airTime=0;this.vy+=v;this.y+=.1;this.height=.1;this.rotation=0;this.flipRot=0;this.jumpCooldown=.6;if(v>=9)this.emit('jump','ev.jump');}
  land(g){const air=this.airTime;this.air=false;this.y=g;this.vy=-pitchAt(this.route,this.z)*this.speed;this.height=0;
   const spins=Math.floor((this.rotation+.3)/TAU),flips=Math.floor((this.flipRot+.3)/TAU),clean=spins||flips||this.rotation<=1.5&&this.flipRot<=1.2;
-  if(spins||flips){this.tricks+=spins+flips;const mix=spins&&flips?1.5:1,name=[flips?`${flips>1?flips+' 周':''}后空翻`:'',spins?`${spins*360}°`:''].filter(Boolean).join(' + ');this.award(Math.round((spins*350+flips*550)*mix),`${name} 落地${mix>1?' · 组合 ×1.5':''}`);}
-  else if(!clean){this.combo=0;this.speed*=.6;this.emit('miss','没转满 · 落地失衡');}else if(air>.5)this.emit('land','稳稳落地');
-  if(this.wallAir&&clean&&air>.5){this.walls=(this.walls||0)+1;this.award(200,'碗壁腾空');}this.wallAir=false;
-  if(air>1.1&&clean){this.bigAir++;this.award(Math.round(air*air*90),air>2.5?`超级滞空 ${air.toFixed(1)}s`:`滞空 ${air.toFixed(1)}s`);}this.rotation=0;this.flipRot=0;}
+  if(spins||flips){this.tricks+=spins+flips;const mix=spins&&flips?1.5:1;this.award(Math.round((spins*350+flips*550)*mix),'ev.landed',{flips,deg:spins*360,mix});}
+  else if(!clean){this.combo=0;this.speed*=.6;this.emit('miss','ev.unbalanced');}else if(air>.5)this.emit('land','ev.land');
+  if(this.wallAir&&clean&&air>.5){this.walls=(this.walls||0)+1;this.award(200,'ev.wall_air');}this.wallAir=false;
+  if(air>1.1&&clean){this.bigAir++;this.award(Math.round(air*air*90),air>2.5?'ev.super_air':'ev.air',{s:air.toFixed(1)});}this.rotation=0;this.flipRot=0;}
  step(dt,input={}){
   if(this.status!=='playing')return;dt=Math.min(.05,Math.max(0,dt));this.time+=dt;this.invincible=Math.max(0,this.invincible-dt);this.jumpCooldown=Math.max(0,this.jumpCooldown-dt);
-  const sec=sectionAt(this.route,this.z);if(sec!==this.section){this.section=sec;if(sec.label)this.emit('section',`${sec.label} · ${sec.tip}`);}
+  const sec=sectionAt(this.route,this.z);if(sec!==this.section){this.section=sec;if(sec.label)this.emit('section',sec.label,0,{tip:sec.tip});}
   const steer=Math.max(-1,Math.min(1,input.steer||0)),pitch=pitchAt(this.route,this.z),v=this.speed;
   const drag=(input.tuck?TUCK_DRAG:DRAG)*this.kit.drag*(1+Math.abs(steer)*.4);let a=this.air?-drag*.5*v*v:9.8*pitch-FRICTION-drag*v*v;
   if(input.brake&&!this.air)a-=sec.kind==='moguls'?(v>this.mogulSafe-3?7:0):9;
@@ -148,25 +149,25 @@ export class Run{
   if(input.jump)this.launch();const prev=this.z;this.z+=this.speed*dt;
   // Vertical motion is absolute, so ramp lips, rollers and cliff edges throw the skier into the air naturally.
   let g=this.ground(this.x,this.z);
-  if(!this.air&&g-this.y>.45){this.x=prevX;this.vx*=-.4;this.speed*=.97;g=this.ground(this.x,this.z);this.emit('bump','被跳台侧壁挡住');}
+  if(!this.air&&g-this.y>.45){this.x=prevX;this.vx*=-.4;this.speed*=.97;g=this.ground(this.x,this.z);this.emit('bump','ev.ramp_side');}
   if(!this.air){const base=this.ground.base,vg=(g-this.ground(this.x,prev))/dt+(base(this.x,this.z)-base(prevX,this.z))/dt;if((vg-this.vy)/dt<-G*1.05&&this.speed>10){this.air=true;this.airTime=0;this.rotation=0;this.flipRot=0;this.wallAir=sec.kind==='bowl'&&Math.abs(this.x)>=bound-.6;this.vy-=G*dt;this.y+=this.vy*dt;}else{this.vy=vg;this.y=g;const base=this.ground.base,side=(base(this.x+.5,this.z)-base(this.x-.5,this.z));this.vx-=side*9.8*.6*dt;}}
   else{this.airTime+=dt;this.vy-=G*dt;this.y+=this.vy*dt;if(input.trick)this.rotation+=dt*this.kit.spin;if(input.flip)this.flipRot+=dt*this.kit.flip;if(this.y<=g)this.land(g);}
   this.height=Math.max(0,this.y-g);this.maxHeight=Math.max(this.maxHeight,this.height);
   for(const o of this.objects){if(this.seen.has(o.id)||o.z<prev-4||o.z>this.z+3)continue;const d=Math.abs(this.x-o.x),crossed=prev<o.z&&this.z>=o.z;
-   if(o.type==='gate'&&crossed){this.seen.add(o.id);if(d<o.width/2){this.gates++;this.award(150,'旗门通过');}else{this.combo=0;this.emit('miss','错过旗门 · 连击归零');}}
-   else if(o.type==='ramp'&&crossed){this.seen.add(o.id);if(d<o.width/2&&o.kind!=='kicker')this.emit('launch',o.kind==='mega'?'超级跳台！':'大跳台！');}
-   else if(o.type==='boost'&&crossed){if(d<o.width/2+.4&&!this.air){this.seen.add(o.id);this.speed=Math.min(MAX_SPEED,this.speed+8);this.emit('boost','加速带 +29 km/h');}}
-   else if(o.type==='coin'&&Math.abs(this.z-o.z)<3&&d<1.9&&Math.abs(this.height-(o.air||0))<3){this.seen.add(o.id);this.coins++;this.score+=50;this.emit('coin','雪晶 +50',50);}
+   if(o.type==='gate'&&crossed){this.seen.add(o.id);if(d<o.width/2){this.gates++;this.award(150,'ev.gate');}else{this.combo=0;this.emit('miss','ev.gate_miss');}}
+   else if(o.type==='ramp'&&crossed){this.seen.add(o.id);if(d<o.width/2&&o.kind!=='kicker')this.emit('launch',o.kind==='mega'?'ev.launch_mega':'ev.launch_big');}
+   else if(o.type==='boost'&&crossed){if(d<o.width/2+.4&&!this.air){this.seen.add(o.id);this.speed=Math.min(MAX_SPEED,this.speed+8);this.emit('boost','ev.boost');}}
+   else if(o.type==='coin'&&Math.abs(this.z-o.z)<3&&d<1.9&&Math.abs(this.height-(o.air||0))<3){this.seen.add(o.id);this.coins++;this.score+=50;this.emit('coin','ev.coin',50);}
    else if(o.type==='mogul'&&crossed){if(d>=o.r)continue;this.seen.add(o.id);if(this.air)continue;
-    if(input.brake||this.speed<=this.mogulSafe){this.moguls++;this.mogulRun++;this.score+=20;this.emit('mogul','',20);if(this.mogulRun%6===0)this.award(120,`雪包节奏 ×${this.mogulRun}`);}
-    else{const over=this.speed-this.mogulSafe;this.mogulRun=0;this.jumpCooldown=0;this.launch(3+over*.35);if(over>8){this.combo=0;this.speed*=.72;this.emit('miss','雪包把你弹飞了 · 按住 ↓ 吸收');}else this.emit('bump','被雪包弹起');}}
-   else if(o.type==='log'&&Math.abs(this.z-o.z)<1&&this.x>o.x0-.55&&this.x<o.x1+.55){if(this.height<1.1){this.seen.add(o.id);this.hit();}else if(crossed){this.seen.add(o.id);this.award(120,'跃过原木');}}
+    if(input.brake||this.speed<=this.mogulSafe){this.moguls++;this.mogulRun++;this.score+=20;this.emit('mogul',null,20);if(this.mogulRun%6===0)this.award(120,'ev.mogul_rhythm',{n:this.mogulRun});}
+    else{const over=this.speed-this.mogulSafe;this.mogulRun=0;this.jumpCooldown=0;this.launch(3+over*.35);if(over>8){this.combo=0;this.speed*=.72;this.emit('miss','ev.mogul_launch');}else this.emit('bump','ev.mogul_bump');}}
+   else if(o.type==='log'&&Math.abs(this.z-o.z)<1&&this.x>o.x0-.55&&this.x<o.x1+.55){if(this.height<1.1){this.seen.add(o.id);this.hit();}else if(crossed){this.seen.add(o.id);this.award(120,'ev.log');}}
    else if((o.type==='tree'||o.type==='rock')&&Math.abs(this.z-o.z)<2){
     if(d<o.radius+.65&&this.height<(o.type==='rock'?1.8:5.5)){this.seen.add(o.id);this.hit();}
-    else if(crossed){this.seen.add(o.id);if(d<o.radius+2.6&&this.height<2)this.award(100,'贴身擦过！');}
+    else if(crossed){this.seen.add(o.id);if(d<o.radius+2.6&&this.height<2)this.award(100,'ev.near');}
    }
   }
-  if(this.z>=this.route.length&&this.status==='playing'){this.z=this.route.length;this.status='finished';const par=profile(this.route).par*1.1,bonus=Math.round(1000+this.hearts*300+Math.max(0,par-this.time)*25);this.score+=bonus;this.emit('finish','抵达山脚',bonus);}
+  if(this.z>=this.route.length&&this.status==='playing'){this.z=this.route.length;this.status='finished';const par=profile(this.route).par*1.1,bonus=Math.round(1000+this.hearts*300+Math.max(0,par-this.time)*25);this.score+=bonus;this.emit('finish','ev.finish',bonus);}
  }
- hit(){if(this.invincible)return;this.hearts--;this.combo=0;this.mogulRun=0;this.speed=8;this.invincible=2;this.emit('hit','撞到了！');if(!this.hearts)this.status='crashed';}
+ hit(){if(this.invincible)return;this.hearts--;this.combo=0;this.mogulRun=0;this.speed=8;this.invincible=2;this.emit('hit','ev.hit');if(!this.hearts)this.status='crashed';}
 }
